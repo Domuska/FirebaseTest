@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "288633216773",
+    "firebase_url": "https://fir-test-de86b.firebaseio.com",
+    "project_id": "fir-test-de86b",
+    "storage_bucket": "fir-test-de86b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288633216773:android:fcabba000c0b8908",
+        "android_client_info": {
+          "package_name": "com.example.tomi.firebasetest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288633216773-q3a15la4d20g8mfjgs04200brfvr9aep.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPPpFxYFalsxmZbC8QsxUh6ffsilLrA6Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
