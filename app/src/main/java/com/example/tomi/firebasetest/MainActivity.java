@@ -5,6 +5,8 @@ import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +15,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText editText;
 
     private DatabaseReference databaseReference;
+    private FirebaseRecyclerAdapter adapter;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +44,16 @@ public class MainActivity extends AppCompatActivity {
         //final DatabaseReference reference = database.getReference("journalEntry2");
         databaseReference = FirebaseDatabase.getInstance().getReference();
         textView = (TextView) findViewById(R.id.textView);
-        editText = (EditText) findViewById(R.id.editText);
+
+
+        final DatabaseReference journalReference = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("journals");
+        final JournalEntry entry = new JournalEntry("seppo",
+                "seppo loysi +5 vorpal swordin",
+                "22-11-2016",
+                "sepon loydokset 22.11",
+                "12311");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -47,14 +62,17 @@ public class MainActivity extends AppCompatActivity {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 //        .setAction("Action", null).show();
                 //databaseReference.setValue("This is a super entry in the journal");
-                String newEntry = editText.getText().toString();
-                databaseReference.child("journals").child("journalEntry3").setValue(newEntry);
+
+                //String newEntry = editText.getText().toString();
+                //databaseReference.child("journals").child("journalEntry3").setValue(newEntry);
+
+                journalReference.push().setValue(entry);
             }
         });
 
-
+        //listener journalentry 3:lle
         //databaseReference.addValueEventListener(new ValueEventListener() {
-        databaseReference.child("journals").child("journalEntry3").addValueEventListener(new ValueEventListener(){
+        /*databaseReference.child("journals").child("journalEntry3").addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String text = dataSnapshot.getValue(String.class);
@@ -67,6 +85,59 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(TAG, "failed to read value: ", databaseError.toException());
             }
         });
+        */
+
+        journalReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                JournalEntry entry = dataSnapshot.getValue(JournalEntry.class);
+                Log.d(TAG, "got new entry, title:" + entry.getTitle()
+                        + ", body: " + entry.getBodyText());
+                //textView.setText(entry.getTitle());
+                //täällä pystys tekemään jonkun hieno notifikaation tai muuta kivaa jos haluaa
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "failed to read value: ", databaseError.toException());
+            }
+        });
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter = new FirebaseRecyclerAdapter<JournalEntry, JournalEntryHolder>(
+                        JournalEntry.class,
+                        android.R.layout.two_line_list_item,
+                        JournalEntryHolder.class,
+                        journalReference) {
+
+            @Override
+            protected void populateViewHolder(JournalEntryHolder viewHolder, JournalEntry entry, int position) {
+                //here we set the text to the fields
+                viewHolder.setTitle(entry.getTitle());
+                viewHolder.setBody(entry.getBodyText());
+            }
+        };
+
+
+        recyclerView.setAdapter(adapter);
 
     }
 
@@ -90,5 +161,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public static class JournalEntryHolder extends RecyclerView.ViewHolder{
+
+        View view;
+
+        public JournalEntryHolder(View view){
+            super(view);
+            this.view = view;
+        }
+
+        public void setTitle(String title){
+            //(TextView)view.findViewById(R.id.text1);
+            ((TextView)view.findViewById(android.R.id.text1)).setText(title);
+        }
+
+        public void setBody(String body){
+            ((TextView)view.findViewById(android.R.id.text2)).setText(body);
+        }
     }
 }
