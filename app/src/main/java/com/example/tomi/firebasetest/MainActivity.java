@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 "seppo loysi +5 vorpal swordin",
                 "22-11-2016",
                 "sepon loydokset 22.11",
-                "12311");
+                "123");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -71,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
                 //String newEntry = editText.getText().toString();
                 //databaseReference.child("journals").child("journalEntry3").setValue(newEntry);
 
-                journalReference.push().setValue(entry);
+                //journalReference.push().setValue(entry);
+                journalReference.child("team 17 journal").setValue(entry);
             }
         });
 
@@ -141,10 +143,33 @@ public class MainActivity extends AppCompatActivity {
                 viewHolder.setTitle(entry.getTitle());
                 viewHolder.setBody(entry.getBodyText());
                 viewHolder.setClickListener(entry);
+
+
             }
         };
 
         recyclerView.setAdapter(adapter);
+
+        Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, journalReference.child("team 17 journal").getKey());
+                journalReference.child("team 17 journal").addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Log.d(TAG, dataSnapshot.getValue(JournalEntry.class).getUid());
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        }
+                );
+            }
+        });
 
     }
 
@@ -193,6 +218,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Log.d(TAG, "item was clicked:" + entry.getTitle());
+                    String uid = entry.getUid();
+                    DatabaseReference reference = FirebaseDatabase.getInstance()
+                            .getReference()
+                            .child("journals");
+                    //Log.d(TAG, reference.child(uid));
                 }
             });
 
