@@ -38,3 +38,7 @@ captures/
 
 # Keystore files
 *.jks
+
+#added by Tomi
+.idea/dictionaries
+.idea/vcs.xml
